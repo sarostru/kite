@@ -16,34 +16,34 @@ pg = ParserGenerator(
 )
 
 @pg.production('main : statement $end')
-def main_statement(p, state):
+def main_statement(state, p):
     return p[0]
     
 @pg.production('expression : NUMBER')
-def expression_number(p, state):
+def expression_number(state, p):
     return Number(float(p[0].getstr()))
     
 @pg.production('expression : SYMBOL')
-def expression_symbol(p, state):
+def expression_symbol(state, p):
     return Symbol(p[0].getstr())
 
 @pg.production('statement : SYMBOL EQUALS expression')
-def statement_assign(p, state):
+def statement_assign(state, p):
     return Assign(p[0].getstr(), p[2])
 
 @pg.production('statement : expression')
-def statement_expr(p, state):
+def statement_expr(state, p):
     return p[0]
 
 @pg.production('expression : OPEN_PARENS expression CLOSE_PARENS')
-def expression_parens(p, state):
+def expression_parens(state, p):
     return p[1]
 
 @pg.production('expression : expression PLUS expression')
 @pg.production('expression : expression MINUS expression')
 @pg.production('expression : expression MUL expression')
 @pg.production('expression : expression DIV expression')
-def expression_binop(p, state):
+def expression_binop(state, p):
     left = p[0]
     right = p[2]
     if p[1].gettokentype() == 'PLUS':
@@ -59,7 +59,7 @@ def expression_binop(p, state):
 
 @pg.production('expression : PLUS expression')
 @pg.production('expression : MINUS expression')
-def expression_unaryop(p, state):
+def expression_unaryop(state, p):
     arg = p[1]
     if p[0].gettokentype() == 'PLUS':
         return Positive(arg)
@@ -67,7 +67,7 @@ def expression_unaryop(p, state):
         return Negative(arg)
 
 @pg.error
-def error_handler(token, state):
+def error_handler(state, token):
     token_type = None
     try:
         token_type = token.gettokentype()

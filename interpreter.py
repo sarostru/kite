@@ -18,7 +18,7 @@ class ParserState(object):
     def __init__(self, filename=None):
         self.filename = filename
 
-def eval(exp, env, pstate=None):
+def eval(exp, env, pstate):
     return p.parse(l.lex(exp), state=pstate).eval(env)
 
 # Quick shortcut function for line by line testing

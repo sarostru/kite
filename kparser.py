@@ -15,20 +15,20 @@ pg = ParserGenerator(
 )
 
 @pg.production('expression : NUMBER')
-def expression_number(p):
+def expression_number(p, state=None):
     # p is a list of the pieces matched by the right hand side of the
     # rule
     return Number(float(p[0].getstr()))
 
 @pg.production('expression : OPEN_PARENS expression CLOSE_PARENS')
-def expression_parens(p):
+def expression_parens(p, state=None):
     return p[1]
 
 @pg.production('expression : expression PLUS expression')
 @pg.production('expression : expression MINUS expression')
 @pg.production('expression : expression MUL expression')
 @pg.production('expression : expression DIV expression')
-def expression_binop(p):
+def expression_binop(p, state=None):
     left = p[0]
     right = p[2]
     if p[1].gettokentype() == 'PLUS':
@@ -44,7 +44,7 @@ def expression_binop(p):
 
 @pg.production('expression : PLUS expression')
 @pg.production('expression : MINUS expression')
-def expression_unaryop(p):
+def expression_unaryop(p, state=None):
     arg = p[1]
     if p[0].gettokentype() == 'PLUS':
         return Positive(arg)

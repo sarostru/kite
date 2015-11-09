@@ -42,6 +42,15 @@ def expression_binop(p):
     else:
         raise AssertionError('Oops, this should not be possible!')
 
+@pg.production('expression : PLUS expression')
+@pg.production('expression : MINUS expression')
+def expression_unaryop(p):
+    arg = p[1]
+    if p[0].gettokentype() == 'PLUS':
+        return Positive(arg)
+    elif p[0].gettokentype() == 'MINUS':
+        return Negative(arg)
+
 @pg.error
 def error_handler(token):
     raise ValueError("Ran into a %s where it was't expected" % token.gettokentype())

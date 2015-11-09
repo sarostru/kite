@@ -15,18 +15,19 @@ class Environment(dict):
         self.parent = parent
 
 class ParserState(object):
-    def __init__(self, root_env):
-        self.env = root_env
+    def __init__(self, filename=None):
+        self.filename = filename
+
+def eval(exp, env, pstate=None):
+    return p.parse(l.lex(exp), state=pstate).eval(env)
 
 # Quick shortcut function for line by line testing
 def qeval(exp):
-    return p.parse(l.lex(exp)).eval()
+    return eval(exp, env={}, pstate=ParserState())
 
-def eval(exp, state):
-    return p.parse(l.lex(exp), state=state).eval()
-    
 def readline(ins=0, outs=1, prompt=""):
-    
+    # Pulled this from the braid repo, you have to use os ops in 
+    # rpython.
     os.write(outs, prompt)
         
     res = ''
@@ -41,18 +42,20 @@ def readline(ins=0, outs=1, prompt=""):
 def printline(result, rprompt=">"):
     print(rprompt + str(result))
             
-def driver_loop(state):
+def driver_loop(env, pstate=None):
     prompt = "('-')>>"
-    rprompt = "('-')>>>"
+    rprompt = "('-')O>>"
     while True:
         line = readline(ins=STDIN, outs=STDOUT, prompt=prompt)
-        if line == "quit()":
+        # TODO:: Exiting should probably not take up a symbol name
+        if line == "quit":
             print(prompt + " Goodbye cruel world!")
             break
-        result = eval(line, state)
+        result = eval(exp=line, env=env, pstate=pstate)
         printline(result, rprompt=rprompt)
         
 def start():
-    global_state = ParserState({})
-    driver_loop(global_state)
+    pstate = ParserState({})
+    env = Environment({})
+    driver_loop(env=env, pstate=pstate)
 

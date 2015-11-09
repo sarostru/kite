@@ -5,16 +5,32 @@ class Number(BaseBox):
     def __init__(self, value):
         self.value = value
 
-    def eval(self):
+    def eval(self, env):
         return self.value
 
+class Symbol(BaseBox):
+    def __init__(self, name):
+        self.name = name
+    
+    def eval(self, env):
+        return env[self.name]
+
+class Assign(BaseBox):
+    def __init__(self, name, exp):
+        self.name = name
+        self.exp = exp
+    
+    def eval(self, env):
+        env[self.name] = self.exp.eval(env)
+        return env[self.name]
+        
 class UnaryOp(BaseBox):
     def __init__(self, op, arg):
         self.arg = arg
         self.op = op
     
-    def eval(self):
-        return self.op(self.arg.eval())
+    def eval(self, env):
+        return self.op(self.arg.eval(env))
 
 class Positive(UnaryOp):
     def __init__(self, arg):
@@ -30,8 +46,8 @@ class BinaryOp(BaseBox):
         self.right = right
         self.op = op
     
-    def eval(self):
-        return self.op(self.left.eval(), self.right.eval())
+    def eval(self, env):
+        return self.op(self.left.eval(env), self.right.eval(env))
 
 class Add(BinaryOp):
     def __init__(self, left, right):

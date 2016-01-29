@@ -10,13 +10,14 @@ STDOUT = 1
 
 
 # TODO:: Environment should be a recursive dict, single layer at the moment
-class Environment(dict):
-    def __init__(self, parent):
-        self.parent = parent
+#   No dict in RPython, so environment will have to be a {}
+# class Environment(dict):
+#     pass
+def Environment():
+    return {}
 
 class ParserState(object):
-    def __init__(self, filename=None):
-        self.filename = filename
+    pass
 
 def eval(exp, env, pstate):
     return p.parse(l.lex(exp), state=pstate).eval(env)
@@ -42,9 +43,9 @@ def readline(ins=0, outs=1, prompt=""):
 def printline(result, rprompt=">"):
     print(rprompt + str(result))
             
-def driver_loop(env, pstate=None):
-    prompt = "('-')>>"
-    rprompt = "('-')O>>"
+def driver_loop(driver, env, pstate=None):
+    prompt = "('-')>> "
+    rprompt = "('-')   "
     while True:
         line = readline(ins=STDIN, outs=STDOUT, prompt=prompt)
         # TODO:: Exiting should probably not take up a symbol name
@@ -53,9 +54,16 @@ def driver_loop(env, pstate=None):
             break
         result = eval(exp=line, env=env, pstate=pstate)
         printline(result, rprompt=rprompt)
+
+class MockJitDriver(object):
+    def __init__(self,**kw): pass
+    def jit_merge_point(self,**kw): pass
+    def can_enter_jit(self,**kw): pass
         
-def start():
-    pstate = ParserState({})
-    env = Environment({})
-    driver_loop(env=env, pstate=pstate)
+def start(driver=None):
+    if driver is None:
+        driver = MockJitDriver()
+    pstate = ParserState()
+    env = Environment()
+    driver_loop(driver=driver, env=env, pstate=pstate)
 

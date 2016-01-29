@@ -72,7 +72,7 @@ def error_handler(state, token):
     try:
         token_type = token.gettokentype()
     except:
-        raise Exception("Parser Error = {}".format(token))
+        raise Exception("Parser Error = %s" % token)
     raise ValueError("Ran into a %s where it was't expected" % token.gettokentype())
 
 
